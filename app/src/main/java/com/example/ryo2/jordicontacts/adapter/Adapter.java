@@ -106,7 +106,7 @@ public class Adapter extends BaseAdapter{
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-    private void dialogoEdit(ItemContact itemContact){
+    private void dialogoEdit(final ItemContact itemContact){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Edita el contacto");
         View viewInflate = LayoutInflater.from(context).inflate(R.layout.dialog_add,null);
@@ -118,7 +118,7 @@ public class Adapter extends BaseAdapter{
         names.setText(itemContact.getName());
         numbers.setText(itemContact.getNumber());
 
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String nameStr = names.getText().toString().trim();
@@ -126,10 +126,15 @@ public class Adapter extends BaseAdapter{
 
                 if (nameStr.length() >0 && numbers.length() > 0) {
                     //
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    itemContact.setName(nameStr);
+                    itemContact.setNumber(numberStr);
+                    realm.copyToRealmOrUpdate(itemContact);
+                    realm.commitTransaction();
                     Toast.makeText(context, "Editado!", Toast.LENGTH_SHORT).show();
                 }
                 else Toast.makeText(context, "Los campos estan vacios :(", Toast.LENGTH_SHORT).show();
-                //adapter.notifyDataSetChanged();
             }
         });
 
