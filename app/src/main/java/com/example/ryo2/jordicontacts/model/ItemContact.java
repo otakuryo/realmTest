@@ -18,11 +18,21 @@ public class ItemContact extends RealmObject {
     @Required
     private String number;
 
+    private int edad;
+    private boolean genero;
+
     public ItemContact(){}
     public ItemContact(long idExt,String nameExt,String numberExt){
         id = idExt;
         name = nameExt;
         number = numberExt;
+    }
+    public ItemContact(long idExt,String nameExt,String numberExt,int edadExt,boolean generoExt){
+        id = idExt;
+        name = nameExt;
+        number = numberExt;
+        edad = edadExt;
+        genero = generoExt;
     }
 
     //seters getters
@@ -50,4 +60,19 @@ public class ItemContact extends RealmObject {
         this.number = number;
     }
 
+    public int getEdad() {
+        return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
+    public boolean isGenero() {
+        return genero;
+    }
+
+    public void setGenero(boolean genero) {
+        this.genero = genero;
+    }
 }

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
-    tools:context="com.example.ryo2.jordicontacts.AddContact">
+    android:paddingEnd="20dp"
+    android:paddingStart="20dp"
+    android:layout_margin="20dp">
     <EditText
         android:id="@+id/name"
         android:hint="Nombre"
@@ -16,6 +15,23 @@
     <EditText
         android:hint="Numero"
         android:id="@+id/number"
+        android:inputType="phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <EditText
+        android:hint="Edad"
+        android:id="@+id/edad"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ToggleButton
+        android:id="@+id/sexo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOn="Mujer"
+        android:textOff="Hombre"/>
+
+
 </LinearLayout>

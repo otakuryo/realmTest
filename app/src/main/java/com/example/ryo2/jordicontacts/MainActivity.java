@@ -2,6 +2,7 @@ package com.example.ryo2.jordicontacts;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.example.ryo2.jordicontacts.adapter.Adapter;
 import com.example.ryo2.jordicontacts.model.ItemContact;
@@ -39,15 +42,19 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //oabrimos realm
+        //Añadimos el toque
+        findViewById(android.R.id.content).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        //fin...
+
+        //abrimos realm
         realm = Realm.getDefaultInstance();
         results = realm.where(ItemContact.class).findAll();
         results.addChangeListener(this);
         //instanciamos los campos
-        Toolbar toolbar = findViewById(R.id.toolbar);
         listView = findViewById(R.id.listView);
         //fin de instancia
-        setSupportActionBar(toolbar);
+
+
 
         adapter = new Adapter(this,results,R.layout.item_contact);
         listView.setAdapter(adapter);
@@ -82,9 +89,9 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         return super.onOptionsItemSelected(item);
     }
 
-    private void createNewContact(String name,String number){
+    private void createNewContact(String name, String number,int edad, boolean genero){
         realm.beginTransaction();
-        ItemContact itemContact = new ItemContact(1+System.currentTimeMillis(),name,number);
+        ItemContact itemContact = new ItemContact(1+System.currentTimeMillis(),name,number,edad,genero);
         realm.copyToRealm(itemContact);
         realm.commitTransaction();
     }
@@ -97,23 +104,31 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
 
         final EditText names = viewInflate.findViewById(R.id.name);
         final EditText numbers = viewInflate.findViewById(R.id.number);
+        final EditText edad = viewInflate.findViewById(R.id.edad);
+        final ToggleButton sexo = viewInflate.findViewById(R.id.sexo);
+
 
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String nameStr = names.getText().toString().trim();
                 String numberStr = numbers.getText().toString().trim();
-                if (nameStr.length() >0 && numbers.length() > 0) createNewContact(nameStr,numberStr);
-                else Toast.makeText(MainActivity.this, "Los campos estan vacios :(", Toast.LENGTH_SHORT).show();
+                String edadStr = edad.getText().toString().trim();
+                boolean sexoBoolean = sexo.getText().toString().equals("Hombre");
+
+                if (nameStr.length() >0 && numbers.length() > 0 && edadStr.length() > 0){
+                    int edadInt = Integer.parseInt(edad.getText().toString());
+                    createNewContact(nameStr,numberStr,edadInt,sexoBoolean);
+                }else if (nameStr.length() >0 && numbers.length() > 0){
+                    createNewContact(nameStr,numberStr,0,sexoBoolean);
+                }
+                else Toast.makeText(MainActivity.this, "Algún campo esta vacio :(", Toast.LENGTH_SHORT).show();
                 //adapter.notifyDataSetChanged();
             }
         });
 
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-    private void dialogoDelete(){
-
     }
 
     @Override
