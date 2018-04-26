@@ -23,4 +23,22 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_edit_black_24dp" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/extras_between"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="90dp"
+        app:srcCompat="@android:drawable/ic_menu_sort_alphabetically" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/extras_order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="160dp"
+        app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
+
 </android.support.design.widget.CoordinatorLayout>

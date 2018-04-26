@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity implements RealmChangeListener<RealmResults<ItemContact>>{
 
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
     Adapter adapter;
     ListView listView;
     RealmResults<ItemContact> results;
+    boolean asc = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,30 +60,39 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
 
         adapter = new Adapter(this,results,R.layout.item_contact);
         listView.setAdapter(adapter);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton add = findViewById(R.id.fab);
+        FloatingActionButton edadOrder = findViewById(R.id.extras_order);
+        FloatingActionButton edadBet = findViewById(R.id.extras_between);
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialogoAdd();
+            }
+        });
+        edadOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                order();
+            }
+        });
+        edadBet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showMorF();
             }
         });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -129,6 +140,35 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+    void order(){
+        if (asc) {
+            results = realm.where(ItemContact.class).findAll().sort("edad");
+            asc = false;
+        }else {
+            results = realm.where(ItemContact.class).findAll().sort("edad",Sort.DESCENDING);
+            asc=true;
+        }
+        adapter = new Adapter(this,results,R.layout.item_contact);
+        listView.setAdapter(adapter);
+    }
+    void showonly(int min, int max){
+        results = realm.where(ItemContact.class)
+                .greaterThan("edad", min)
+                .lessThan("edad",max)
+                .findAll();
+        adapter = new Adapter(this,results,R.layout.item_contact);
+        listView.setAdapter(adapter);
+
+    }
+    boolean gen=true;
+    void showMorF(){
+        results = realm.where(ItemContact.class)
+                .equalTo("genero",gen)
+                .findAll();
+        gen=!gen;
+        adapter = new Adapter(this,results,R.layout.item_contact);
+        listView.setAdapter(adapter);
     }
 
     @Override
