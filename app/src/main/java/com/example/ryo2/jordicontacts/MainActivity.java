@@ -2,19 +2,12 @@ package com.example.ryo2.jordicontacts;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -22,9 +15,7 @@ import android.widget.ToggleButton;
 
 import com.example.ryo2.jordicontacts.adapter.Adapter;
 import com.example.ryo2.jordicontacts.model.ItemContact;
-import com.example.ryo2.jordicontacts.preferencias.Prefs;
 
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -50,19 +41,16 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
 
         //abrimos realm
         realm = Realm.getDefaultInstance();
-        results = realm.where(ItemContact.class).findAll();
-        results.addChangeListener(this);
         //instanciamos los campos
         listView = findViewById(R.id.listView);
         //fin de instancia
+        load();
 
-
-
-        adapter = new Adapter(this,results,R.layout.item_contact);
-        listView.setAdapter(adapter);
         FloatingActionButton add = findViewById(R.id.fab);
         FloatingActionButton edadOrder = findViewById(R.id.extras_order);
         FloatingActionButton edadBet = findViewById(R.id.extras_between);
+        FloatingActionButton genDisct = findViewById(R.id.extras_only);
+        FloatingActionButton refresh = findViewById(R.id.extras_refresh);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,26 +66,35 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         edadBet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dialogoBetween();
+            }
+        });
+        genDisct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 showMorF();
             }
         });
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                load();
+            }
+        });
+    }
+
+    void load(){
+        results = realm.where(ItemContact.class).findAll();
+        results.addChangeListener(this);
+
+        adapter = new Adapter(this,results,R.layout.item_contact);
+        listView.setAdapter(adapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void createNewContact(String name, String number,int edad, boolean genero){
@@ -141,19 +138,45 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+    private void dialogoBetween(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Buscar entre edades");
+        View viewInflate = LayoutInflater.from(this).inflate(R.layout.dialog_between,null);
+        builder.setView(viewInflate);
+
+        final EditText edada = viewInflate.findViewById(R.id.edada);
+        final EditText edadb = viewInflate.findViewById(R.id.edadb);
+
+
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String a =edada.getText().toString().trim();
+                String b =edadb.getText().toString().trim();
+                if (a.length() >0 && b.length() > 0){
+                    showonly(Integer.parseInt(a),Integer.parseInt(b));
+                }
+                else Toast.makeText(MainActivity.this, "Algún campo esta vacio :(", Toast.LENGTH_SHORT).show();
+                //adapter.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
     void order(){
         if (asc) {
-            results = realm.where(ItemContact.class).findAll().sort("edad");
+            results = results.sort("edad");
             asc = false;
         }else {
-            results = realm.where(ItemContact.class).findAll().sort("edad",Sort.DESCENDING);
+            results = results.sort("edad",Sort.DESCENDING);
             asc=true;
         }
         adapter = new Adapter(this,results,R.layout.item_contact);
         listView.setAdapter(adapter);
     }
     void showonly(int min, int max){
-        results = realm.where(ItemContact.class)
+        results = results.where()
                 .greaterThan("edad", min)
                 .lessThan("edad",max)
                 .findAll();
